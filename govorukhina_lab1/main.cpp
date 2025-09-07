@@ -76,3 +76,56 @@ void viewAll() {
         << ", Класс: " << s.stationClass << endl;
     }
 }
+
+void editPipe() {
+    if (pipes.empty()) {
+        cout << "Нет доступных труб\n";
+        return;
+    }
+    
+    cout << "Выберите трубу для редактирования (0-" << pipes.size()-1 << "):\n";
+    for (size_t i = 0; i < pipes.size(); ++i) {
+        cout << i << ". " << pipes[i].name << endl;
+    }
+    
+    size_t index;
+    cin >> index;
+    if (index < pipes.size()) {
+        pipes[index].underRepair = !pipes[index].underRepair;
+        cout << "Статус ремонта изменен на: " << (pipes[index].underRepair ? "В ремонте" : "Работает") << endl;
+    } else {
+        cout << "\n";
+    }
+};
+
+void editStation() {
+    if (stations.empty()) {
+        cout << "Нет доступных КС!\n";
+        return;
+    }
+    
+    cout << "Выберите КС для редактирования (0-" << stations.size()-1 << "):\n";
+    for (size_t i = 0; i < stations.size(); ++i) {
+        cout << i << ". " << stations[i].name << endl;
+    }
+    
+    size_t index;
+    cin >> index;
+    if (index < stations.size()) {
+        cout << "1. Запустить цех\n2. Остановить цех\n";
+        int choice;
+        cin >> choice;
+        if (choice == 1 && stations[index].activeWorkshops < stations[index].totalWorkshops) {
+            stations[index].activeWorkshops++;
+            cout << "Цех запущен!\n";
+        } else if (choice == 2 && stations[index].activeWorkshops > 0) {
+            stations[index].activeWorkshops--;
+            cout << "Цех остановлен!\n";
+        } else {
+            cout << "Невозможно выполнить операцию!\n";
+        }
+    } else {
+        cout << "Неверный индекс!\n";
+    }
+}
+
