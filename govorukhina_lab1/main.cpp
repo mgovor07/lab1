@@ -1,15 +1,9 @@
-//
-//  main.cpp
-//  govorukhina_lab1
-//
-//  Created by Мария Говорухина on 07.09.2025.
-//
-
 #include <iostream>
 #include <vector>
 #include <fstream>
 #include <string>
 #include <limits>
+#include <sstream>
 
 using namespace std;
 
@@ -27,18 +21,53 @@ struct CompressorStation {
     int stationClass;
 };
 
-vector<Pipe>pipes;
-vector<CompressorStation> stations; //используем векторы для хранения данных
+vector<Pipe> pipes;
+vector<CompressorStation> stations;
+
+// функция для безопасного ввода целых чисел
+int getIntInput(const string& prompt) {
+    int value;
+    while (true) {
+        cout << prompt;
+        string input;
+        getline(cin, input);
+        
+        try {
+            value = stoi(input);
+            break;
+        } catch (const exception&) {
+            cout << "Ошибка: пожалуйста, введите целое число.\n";
+        }
+    }
+    return value;
+}
+
+// функция для безопасного ввода чисел с плавающей точкой
+double getDoubleInput(const string& prompt) {
+    double value;
+    while (true) {
+        cout << prompt;
+        string input;
+        getline(cin, input);
+        
+        try {
+            value = stod(input);
+            break;
+        } catch (const exception&) {
+            cout << "Ошибка: пожалуйста, введите число.\n";
+        }
+    }
+    return value;
+}
 
 void addPipe() {
     Pipe p;
-    cout << "Ведите название трубы: ";
-    cin.ignore();
+    cout << "Введите название трубы: ";
     getline(cin, p.name);
-    cout << "Введите длину трубы (км): ";
-    cin >> p.length;
-    cout << "Введите диаметр трубы (мм): ";
-    cin >> p.diameter;
+    
+    p.length = getDoubleInput("Введите длину трубы (км): ");
+    p.diameter = getIntInput("Введите диаметр трубы (мм): ");
+    
     p.underRepair = false;
     pipes.push_back(p);
     cout << "Труба добавлена!\n";
@@ -46,40 +75,46 @@ void addPipe() {
 
 void addStation() {
     CompressorStation cs;
-    cout << "Ведите название КС: ";
-    cin.ignore();
+    cout << "Введите название КС: ";
     getline(cin, cs.name);
-    cout << "Введите количество цехов: ";
-    cin >> cs.totalWorkshops;
-    cout << "Введите количество работающих цехов: ";
-    cin >> cs.activeWorkshops;
-    cout << "Введите класс станции: ";
-    cin >> cs.stationClass;
+    
+    cs.totalWorkshops = getIntInput("Введите количество цехов: ");
+    
+    // Проверка, что работающих цехов не больше общего количества
+    while (true) {
+        cs.activeWorkshops = getIntInput("Введите количество работающих цехов: ");
+        if (cs.activeWorkshops <= cs.totalWorkshops) {
+            break;
+        }
+        cout << "Ошибка: количество работающих цехов не может превышать общее количество цехов.\n";
+    }
+    
+    cs.stationClass = getIntInput("Введите класс станции: ");
     stations.push_back(cs);
     cout << "КС добавлена!\n";
 }
 
 void viewAll() {
-    cout << "\n Трубы \n";
+    cout << "\n=== Трубы ===\n";
     for (const auto& p : pipes) {
         cout << "Название: " << p.name
-        << ", Длина: " << p.length
-        << "км, Диаметр: " << p.diameter
-        << "мм, В ремонте: " << (p.underRepair ? "Да" : "Нет") << endl;
+             << ", Длина: " << p.length
+             << " км, Диаметр: " << p.diameter
+             << " мм, В ремонте: " << (p.underRepair ? "Да" : "Нет") << endl;
     }
-    
-    cout << "\n Компрессионные станции \n";
+
+    cout << "\n=== Компрессорные станции ===\n";
     for (const auto& s : stations) {
         cout << "Название: " << s.name
-        << ", Цехов: " << s.totalWorkshops
-        << ", Работает: " << s.activeWorkshops
-        << ", Класс: " << s.stationClass << endl;
+             << ", Цехов: " << s.totalWorkshops
+             << ", Работает: " << s.activeWorkshops
+             << ", Класс: " << s.stationClass << endl;
     }
 }
 
 void editPipe() {
     if (pipes.empty()) {
-        cout << "Нет доступных труб\n";
+        cout << "Нет доступных труб!\n";
         return;
     }
     
@@ -88,15 +123,15 @@ void editPipe() {
         cout << i << ". " << pipes[i].name << endl;
     }
     
-    size_t index;
-    cin >> index;
-    if (index < pipes.size()) {
+    int index = getIntInput("Введите номер трубы: ");
+    if (index >= 0 && index < pipes.size()) {
         pipes[index].underRepair = !pipes[index].underRepair;
-        cout << "Статус ремонта изменен на: " << (pipes[index].underRepair ? "В ремонте" : "Работает") << endl;
+        cout << "Статус ремонта изменен на: "
+             << (pipes[index].underRepair ? "В ремонте" : "Работает") << endl;
     } else {
-        cout << "\n";
+        cout << "Неверный индекс!\n";
     }
-};
+}
 
 void editStation() {
     if (stations.empty()) {
@@ -109,12 +144,11 @@ void editStation() {
         cout << i << ". " << stations[i].name << endl;
     }
     
-    size_t index;
-    cin >> index;
-    if (index < stations.size()) {
+    int index = getIntInput("Введите номер КС: ");
+    if (index >= 0 && index < stations.size()) {
         cout << "1. Запустить цех\n2. Остановить цех\n";
-        int choice;
-        cin >> choice;
+        int choice = getIntInput("Выберите действие: ");
+        
         if (choice == 1 && stations[index].activeWorkshops < stations[index].totalWorkshops) {
             stations[index].activeWorkshops++;
             cout << "Цех запущен!\n";
@@ -188,11 +222,9 @@ int main() {
              << "5. Редактировать КС\n"
              << "6. Сохранить\n"
              << "7. Загрузить\n"
-             << "0. Выход\n"
-             << "Выберите действие: ";
+             << "0. Выход\n";
         
-        int choice;
-        cin >> choice;
+        int choice = getIntInput("Выберите действие: ");
         
         switch (choice) {
             case 1: addPipe(); break;
