@@ -26,3 +26,35 @@ struct CompressorStation {
     int activeWorkshops;
     int stationClass;
 };
+
+vector<Pipe>pipes;
+vector<CompressorStation> stations; //используем векторы для хранения данных
+
+void addPipe() {
+    Pipe p;
+    cout << "Ведите название трубы: ";
+    cin.ignore();
+    getline(cin, p.name);
+    cout << "Введите длину трубы (км): ";
+    cin >> p.length;
+    cout << "Введите диаметр трубы (мм): ";
+    cin >> p.diameter;
+    p.underRepair = false;
+    pipes.push_back(p);
+    cout << "Труба добавлена!\n";
+}
+
+void addStation() {
+    CompressorStation cs;
+    cout << "Ведите название КС: ";
+    cin.ignore();
+    getline(cin, cs.name);
+    cout << "Введите количество цехов: ";
+    cin >> cs.totalWorkshops;
+    cout << "Введите количество работающих цехов: ";
+    cin >> cs.activeWorkshops;
+    cout << "Введите класс станции: ";
+    cin >> cs.stationClass;
+    stations.push_back(cs);
+    cout << "КС добавлена!\n";
+}
