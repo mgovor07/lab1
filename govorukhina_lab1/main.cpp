@@ -129,3 +129,81 @@ void editStation() {
     }
 }
 
+void saveData() {
+    ofstream fout("data.txt");
+    fout << pipes.size() << endl;
+    for (const auto& p : pipes) {
+        fout << p.name << endl << p.length << endl << p.diameter << endl << p.underRepair << endl;
+    }
+    
+    fout << stations.size() << endl;
+    for (const auto& s : stations) {
+        fout << s.name << endl << s.totalWorkshops << endl << s.activeWorkshops << endl << s.stationClass << endl;
+    }
+    fout.close();
+    cout << "Данные сохранены!\n";
+}
+
+void loadData() {
+    ifstream fin("data.txt");
+    if (!fin.is_open()) {
+        cout << "Файл данных не найден!\n";
+        return;
+    }
+    
+    pipes.clear();
+    stations.clear();
+    
+    size_t pipeCount, stationCount;
+    fin >> pipeCount;
+    fin.ignore();
+    for (size_t i = 0; i < pipeCount; ++i) {
+        Pipe p;
+        getline(fin, p.name);
+        fin >> p.length >> p.diameter >> p.underRepair;
+        fin.ignore();
+        pipes.push_back(p);
+    }
+    
+    fin >> stationCount;
+    fin.ignore();
+    for (size_t i = 0; i < stationCount; ++i) {
+        CompressorStation cs;
+        getline(fin, cs.name);
+        fin >> cs.totalWorkshops >> cs.activeWorkshops >> cs.stationClass;
+        fin.ignore();
+        stations.push_back(cs);
+    }
+    fin.close();
+    cout << "Данные загружены!\n";
+}
+
+int main() {
+    while (true) {
+        cout << "\nМеню:\n"
+             << "1. Добавить трубу\n"
+             << "2. Добавить КС\n"
+             << "3. Просмотр всех объектов\n"
+             << "4. Редактировать трубу\n"
+             << "5. Редактировать КС\n"
+             << "6. Сохранить\n"
+             << "7. Загрузить\n"
+             << "0. Выход\n"
+             << "Выберите действие: ";
+        
+        int choice;
+        cin >> choice;
+        
+        switch (choice) {
+            case 1: addPipe(); break;
+            case 2: addStation(); break;
+            case 3: viewAll(); break;
+            case 4: editPipe(); break;
+            case 5: editStation(); break;
+            case 6: saveData(); break;
+            case 7: loadData(); break;
+            case 0: return 0;
+            default: cout << "Неверный выбор!\n";
+        }
+    }
+}
