@@ -58,3 +58,21 @@ void addStation() {
     stations.push_back(cs);
     cout << "КС добавлена!\n";
 }
+
+void viewAll() {
+    cout << "\n Трубы \n";
+    for (const auto& p : pipes) {
+        cout << "Название: " << p.name
+        << ", Длина: " << p.length
+        << "км, Диаметр: " << p.diameter
+        << "мм, В ремонте: " << (p.underRepair ? "Да" : "Нет") << endl;
+    }
+    
+    cout << "\n Компрессионные станции \n";
+    for (const auto& s : stations) {
+        cout << "Название: " << s.name
+        << ", Цехов: " << s.totalWorkshops
+        << ", Работает: " << s.activeWorkshops
+        << ", Класс: " << s.stationClass << endl;
+    }
+}
